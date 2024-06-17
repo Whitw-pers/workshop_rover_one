@@ -36,12 +36,13 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // declaring v and w here limits their scope to the main loop so there aren't conflicts with motor_controller()
+  // declaring v and w here limits their scope to the loop() function so there aren't conflicts with motor_controller()
 
   //--------------------declare velocity variables--------------------
   int v = 0;        // linear velocity (100 forward full, -100 is back full)
   int w = 0;        // angular velocity (100 is rotate left full, -100 is rotate right full)
 
+  motor_controller(v, w);
 }
 
 //--------------------CUSTOM FXNS--------------------
