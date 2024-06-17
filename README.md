@@ -1,2 +1,2 @@
 # workshop_rover_one
-Template repository for the Colorado Space Grant Consortium New Robotics Workshop rover code.
+Repository for complete COSGC New Robotics Workshop code. See my_rover for New Robotics Workshop template.
