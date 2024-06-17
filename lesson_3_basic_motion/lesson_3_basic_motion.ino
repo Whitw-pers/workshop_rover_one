@@ -71,31 +71,31 @@ void drive(int vel_L, int vel_R) {
 // expects vel_L and vel_R to be between -255 and 255
 
   // left motor
-  if (spd_L > 0) {  // left motor forward
+  if (vel_L > 0) {  // left motor forward
     digitalWrite(L1, HIGH);
     digitalWrite(L2, LOW);
   }
-  if (spd_L < 0) {  // left motor backward
+  if (vel_L < 0) {  // left motor backward
     digitalWrite(L1, LOW);
     digitalWrite(L2, HIGH);
   }
-  if (spd_L == 0) {  // left motor forward
+  if (vel_L == 0) {  // left motor forward
     digitalWrite(L1, LOW);
     digitalWrite(L2, LOW);
   }
   // right motor
-if (spd_R > 0) {  // right motor forward
+if (vel_R > 0) {  // right motor forward
     digitalWrite(R1, HIGH);
     digitalWrite(R2, LOW);
   }
-  if (spd_R < 0) {  // right motor backward
+  if (vel_R < 0) {  // right motor backward
     digitalWrite(R1, LOW);
     digitalWrite(R2, HIGH);
   }
-  if (spd_R == 0) {  // right motor forward
+  if (vel_R == 0) {  // right motor forward
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
   }
-  analogWrite(pwmL, abs(spd_L));
-  analogWrite(pwmR, abs(spd_R));
+  analogWrite(pwmL, abs(vel_L));
+  analogWrite(pwmR, abs(vel_R));
 }
