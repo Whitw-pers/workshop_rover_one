@@ -11,14 +11,14 @@ left and right directions referenced in comments are from the robot's perspectiv
 const float r = 0.030;   // radius of drive wheels in meters
 const float L = 0.146;   // width separating the drive wheels in meters
 
-//--------------------define motor pins--------------------
+//--------------------declare motor pins--------------------
 // setup() and drive() use these variables to control Arduino pins
-// define pins to control right motor
+// declare pins to control right motor
 const int R1 = 3;    //AI1
 const int R2 = 4;    //AI2
 const int pwmR = 5;  //PWMA
 
-// define pins to control right motor
+// declare pins to control right motor
 const int L1 = 7;    //BI1
 const int L2 = 8;    //BI2
 const int pwmL = 9;  //PWMB
@@ -59,11 +59,10 @@ void loop() {
 // void drive(vel_L, vel_R)
 
 void motor_controller(int v, int w) {
-// gets the desired linear and angular velocity of our robot
-// expects -0.346 < v < 0.346 m/s, -4.73 < w < 4.73 rad/s
-// motors will saturate if desired velocity vector is too large, best to keep desired velocities low
 // determines required wheel speeds (in rad/s) based on linear and angular velocities (m/s, rad/s)
 // maps required wheel speeds to PWM duty cycle
+// expects -0.346 < v < 0.346 m/s, -4.73 < w < 4.73 rad/s
+// motors will saturate if desired velocity vector is too large, best to keep desired velocities low
 
   int dphi_L = (v/r) - (L * w)/(2 * r);
   int dphi_R = (v/r) + (L * w)/(2 * r);
