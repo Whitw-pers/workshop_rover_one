@@ -7,10 +7,12 @@ left and right directions referenced in comments are from the robot's perspectiv
 */ 
 
 //--------------------rover geometry parameters--------------------
-const float r = ;   // radius of drive wheels
-const float L = ;   // width separating the drive wheels
+// motor_controller() uses these parameters to calculate wheel velocities
+const float r = 0.030;   // radius of drive wheels in meters
+const float L = 0.146;   // width separating the drive wheels in meters
 
 //--------------------define motor pins--------------------
+// setup() and drive() use these variables to control Arduino pins
 // define pins to control right motor
 const int R1 = 3;    //AI1
 const int R2 = 4;    //AI2
@@ -36,13 +38,20 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // declaring v and w here limits their scope to the loop() function so there aren't conflicts with motor_controller()
 
   //--------------------declare velocity variables--------------------
-  int v = 0;        // linear velocity (100 forward full, -100 is back full)
-  int w = 0;        // angular velocity (100 is rotate left full, -100 is rotate right full)
-
+  // declaring v and w here limits their scope to loop() so there aren't conflicts with motor_controller()
+  int v = 0.346;        // linear velocity (0.346 is forward full, -0.346 is back full)
+  int w = 0;        // angular velocity (4.73 is rotate left full, -4.73 is rotate right full)
   motor_controller(v, w);
+  delay(2000);
+
+  v = 0;
+  w = 4.73;
+  motor_controller(v,w);
+  delay(2000);
+
+  // play around with the velocities, motor_controller() function, and the delay() function and see what you can get your robot to do
 }
 
 //--------------------CUSTOM FXNS--------------------
@@ -51,23 +60,27 @@ void loop() {
 
 void motor_controller(int v, int w) {
 // gets the desired linear and angular velocity of our robot
-// expects -1 < v, w < 1
-// determines required wheel speeds based on linear and angular velocities
+// expects -0.346 < v < 0.346 m/s, -4.73 < w < 4.73 rad/s
+// motors will saturate if desired velocity vector is too large, best to keep desired velocities low
+// determines required wheel speeds (in rad/s) based on linear and angular velocities (m/s, rad/s)
 // maps required wheel speeds to PWM duty cycle
 
   int dphi_L = (v/r) - (L * w)/(2 * r);
   int dphi_R = (v/r) + (L * w)/(2 * r);
 
-  dphi_L = constrain(dphi_L, -100, 100);
-  dphi_R = constrain(dphi_R, -100, 100);
+  // use the constrain function to keep dphi_L and dphi_R within certain boundaries
+  // this prevents unintended behavior of the map function
+  dphi_L = constrain(dphi_L, -11.52, 11.52);
+  dphi_R = constrain(dphi_R, -11.52, 11.52);
 
-  dphi_L = map(dphi_L, -100, 100, -255, 255);
-  dphi_R = map(dphi_R, -100, 100, -255, 255);
+  dphi_L = map(dphi_L, -11.52, 11.52, -255, 255);
+  dphi_R = map(dphi_R, -11.52, 11.52, -255, 255);
 
   drive(dphi_L, dphi_R);
 }
 
 void drive(int vel_L, int vel_R) {
+// based on PWM duty cycle setting, assigns motor driver pin values
 // expects vel_L and vel_R to be between -255 and 255
 
   // left motor
