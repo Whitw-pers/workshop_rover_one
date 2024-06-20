@@ -41,9 +41,14 @@ void loop() {
 
   //--------------------declare velocity variables--------------------
   // declaring v and w here limits their scope to loop() so there aren't conflicts with motor_controller()
-  int v = 0.346;        // linear velocity (0.346 is forward full, -0.346 is back full)
-  int w = 0;        // angular velocity (4.73 is rotate left full, -4.73 is rotate right full)
+  float v = 0.346;    // linear velocity (0.346 is forward full, -0.346 is back full)
+  float w = 0;        // angular velocity (4.73 is rotate left full, -4.73 is rotate right full)
   motor_controller(v, w);
+  delay(2000);
+
+  v = -0.346;
+  w = 0;
+  motor_controller(v,w);
   delay(2000);
 
   v = 0;
@@ -51,7 +56,12 @@ void loop() {
   motor_controller(v,w);
   delay(2000);
 
-  // play around with the velocities, motor_controller() function, and the delay() function and see what you can get your robot to do
+  v = 0;
+  w = -4.73;
+  motor_controller(v,w);
+  delay(2000);
+
+  // play around with the velocities and the delay() function and see what you can get your robot to do
 }
 
 //--------------------CUSTOM FXNS--------------------
@@ -64,50 +74,53 @@ void motor_controller(int v, int w) {
 // expects -0.346 < v < 0.346 m/s, -4.73 < w < 4.73 rad/s
 // motors will saturate if desired velocity vector is too large, best to keep desired velocities low
 
-  int dphi_L = (v/r) - (L * w)/(2 * r);
-  int dphi_R = (v/r) + (L * w)/(2 * r);
+  float dphi_L = (v/r) - (L * w)/(2 * r);
+  float dphi_R = (v/r) + (L * w)/(2 * r);
 
   // use the constrain function to keep dphi_L and dphi_R within certain boundaries
   // this prevents unintended behavior of the map function
   dphi_L = constrain(dphi_L, -11.52, 11.52);
   dphi_R = constrain(dphi_R, -11.52, 11.52);
 
-  dphi_L = map(dphi_L, -11.52, 11.52, -255, 255);
-  dphi_R = map(dphi_R, -11.52, 11.52, -255, 255);
+  // need to confirm map() behaves well when given non-int input
+  // map() uses integer math, returns only integers which is not a problem in this case
+  // would be a problem if it misbehaves with float input
+  int duty_L = map(dphi_L, -11.52, 11.52, -255, 255);
+  int duty_R = map(dphi_R, -11.52, 11.52, -255, 255);
 
-  drive(dphi_L, dphi_R);
+  drive(duty_L, duty_R);
 }
 
-void drive(int vel_L, int vel_R) {
+void drive(int duty_L, int duty_R) {
 // based on PWM duty cycle setting, assigns motor driver pin values
-// expects vel_L and vel_R to be between -255 and 255
+// expects duty_L and duty_R to be between -255 and 255
 
   // left motor
-  if (vel_L > 0) {  // left motor forward
+  if (duty_L > 0) {  // left motor forward
     digitalWrite(L1, HIGH);
     digitalWrite(L2, LOW);
   }
-  if (vel_L < 0) {  // left motor backward
+  if (duty_L < 0) {  // left motor backward
     digitalWrite(L1, LOW);
     digitalWrite(L2, HIGH);
   }
-  if (vel_L == 0) {  // left motor forward
+  if (duty_L == 0) {  // left motor forward
     digitalWrite(L1, LOW);
     digitalWrite(L2, LOW);
   }
   // right motor
-if (vel_R > 0) {  // right motor forward
+if (duty_R > 0) {  // right motor forward
     digitalWrite(R1, HIGH);
     digitalWrite(R2, LOW);
   }
-  if (vel_R < 0) {  // right motor backward
+  if (duty_R < 0) {  // right motor backward
     digitalWrite(R1, LOW);
     digitalWrite(R2, HIGH);
   }
-  if (vel_R == 0) {  // right motor forward
+  if (duty_R == 0) {  // right motor forward
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
   }
-  analogWrite(pwmL, abs(vel_L));
-  analogWrite(pwmR, abs(vel_R));
+  analogWrite(pwmL, abs(duty_L));
+  analogWrite(pwmR, abs(duty_R));
 }
