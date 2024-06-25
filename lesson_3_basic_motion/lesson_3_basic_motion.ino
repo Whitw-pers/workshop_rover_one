@@ -109,7 +109,7 @@ void drive(int duty_L, int duty_R) {
     digitalWrite(L2, LOW);
   }
   // right motor
-if (duty_R > 0) {  // right motor forward
+  if (duty_R > 0) {  // right motor forward
     digitalWrite(R1, HIGH);
     digitalWrite(R2, LOW);
   }
