@@ -76,6 +76,30 @@ void loop() {
 // void motor_controller(v, w)
 // void drive(vel_L, vel_R)
 
+float get_distance() {
+  float echoTime;             // var to store time of flight
+  float calculatedDistance;   // var to store distance calculated from time of flight
+
+  // send out an ultrasonic pulse thats 10ms long
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+
+  // use pulseIn function to see how long it takes for the pulse to return to the sensor
+  echoTime = pulseIn(echo, HIGH);
+
+  // calculate distance using formula from ToF sensor section
+  calculatedDistance = echoTime * 346 / 2; // make sure this fxn returns reasonable vals
+}
+
+bool get_line() {
+
+}
+
+float get_odom() {
+  
+}
+
 void motor_controller(int v, int w) {
 // determines required wheel speeds (in rad/s) based on linear and angular velocities (m/s, rad/s)
 // maps required wheel speeds to PWM duty cycle
@@ -117,7 +141,7 @@ void drive(int duty_L, int duty_R) {
     digitalWrite(L2, LOW);
   }
   // right motor
-if (duty_R > 0) {  // right motor forward
+  if (duty_R > 0) {  // right motor forward
     digitalWrite(R1, HIGH);
     digitalWrite(R2, LOW);
   }
