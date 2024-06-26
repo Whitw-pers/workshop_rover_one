@@ -54,6 +54,7 @@ enum STATE last_state;
 enum STATE current_state = follow_right;  // give it a value so we can enter the switch:case on first loop
 enum STATE next_state = current_state;    // give this a value so our switch:case behaves
 
+
 void setup() {
   // put your setup code here, to run once:
 
@@ -154,6 +155,8 @@ void loop() {
       // perform set of actions
       motor_controller(0, 0);
       delay(3000);
+      right_encoder.setEncoderCount(0);
+      left_encoder.setEncoderCount(0);
       // set next_state
       if (last_state == follow_right) {
         next_state = turn_right;
@@ -170,12 +173,14 @@ void loop() {
   current_state = next_state;
 }
 
+
 //--------------------CUSTOM FXNS--------------------
 // float get_distance();
 // bool get_line();
-// float get_odom();
+// long get_odom();
 // void motor_controller(v, w)
 // void drive(vel_L, vel_R)
+
 
 float get_distance() {
   float echo_time;             // var to store time of flight
