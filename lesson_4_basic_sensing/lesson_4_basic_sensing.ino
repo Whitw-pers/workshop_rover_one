@@ -6,8 +6,12 @@ robot is oriented correctly when the USB in of the arduino is_____
 left and right directions referenced in comments are from the robot's perspective
 */ 
 
+// include the QuadratureEncoder library
+#include <QuadratureEncoder.h>
+
 //--------------------rover geometry parameters--------------------
 // motor_controller() uses these parameters to calculate wheel velocities
+// get_odom() uses them to track distance travelled
 const float r = 0.030;   // radius of drive wheels in meters
 const float L = 0.146;   // width separating the drive wheels in meters
 
@@ -33,12 +37,16 @@ const int trig = ;
 
 const int ir = ;
 
-// declare a and b pins for encoders
+// declare a and b pins for encoders (can be analog pins)
 
 const int a_r = ;
 const int b_r = ;
 const int a_l = ;
 const int b_l = ;
+
+// lets also create our encoder objects
+Encoders right_encoder(a_r, b_r);
+Encoders left_encoder(a_l, b_l);
 
 void setup() {
   // put your setup code here, to run once:
@@ -57,10 +65,7 @@ void setup() {
   pinMode(echo, INPUT);
   pinMode(trig, OUTPUT);
   pinMode(ir, INPUT);
-  pinMode(a_r, );
-  pinMode(b_r, );
-  pinMode(a_l, );
-  pinMode(b_l, );
+  // no need to setup our encoder pins, the library takes care of that
 
 }
 
@@ -72,6 +77,11 @@ void loop() {
 
   // uncomment to test get_line()
   // Serial.println(get_line());
+
+  // uncomment to test get_odom()
+  // motor_controller(0.346, 0);
+  // delay(2000);
+  // Serial.println(get_odom());
 
   // going to put our FSM in here
 
@@ -104,8 +114,15 @@ bool get_line() {
   return digitalRead(ir);
 }
 
-float get_odom() {
-  
+long get_odom() {
+  // get encoder counts using getEncoderCount method from the Encoders class
+  long left_encoder_count = left_encoder.getEncoderCount();
+  long right_encoder_count = right_encoder.getEncoderCount();
+
+  long left_wheel_pos = left_encoder_count * ((2 * pi) / 3575.04);
+  long right_wheel_pos = right_encoder_count * ((2 * pi) / 3575.04);
+
+  return long odom = (r / 2) * (left_wheel_pos + right_wheel_pos);
 }
 
 void motor_controller(int v, int w) {
