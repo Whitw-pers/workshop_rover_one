@@ -207,10 +207,11 @@ long get_odom() {
   long left_encoder_count = left_encoder.getEncoderCount();
   long right_encoder_count = right_encoder.getEncoderCount();
 
-  long left_wheel_pos = left_encoder_count * ((2 * pi) / 3575.04);
-  long right_wheel_pos = right_encoder_count * ((2 * pi) / 3575.04);
+  long left_wheel_pos = left_encoder_count * ((2 * 3.14) / 3575.04);
+  long right_wheel_pos = right_encoder_count * ((2 * 3.14) / 3575.04);
 
-  return long odom = (r / 2) * (left_wheel_pos + right_wheel_pos);
+  long odom = (r / 2) * (left_wheel_pos + right_wheel_pos);
+  return odom;
 }
 
 void motor_controller(int v, int w) {
