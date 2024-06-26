@@ -43,6 +43,8 @@ const int b_l = ;
 void setup() {
   // put your setup code here, to run once:
 
+  Serial.begin(9600); // initialize the serial monitor so we can use it to check our work
+
   //--------------------setup motor pins--------------------
   pinMode(R1, OUTPUT);
   pinMode(R2, OUTPUT);
@@ -52,9 +54,9 @@ void setup() {
   pinMode(pwmL, OUTPUT);
 
   //--------------------setup sensor pins--------------------
-  pinMode(echo, );
-  pinMode(trig, );
-  pinMode(ir, );
+  pinMode(echo, INPUT);
+  pinMode(trig, OUTPUT);
+  pinMode(ir, INPUT);
   pinMode(a_r, );
   pinMode(b_r, );
   pinMode(a_l, );
@@ -64,6 +66,12 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  // uncomment to test get_distance()
+  // Serial.println(get_distance());
+
+  // uncomment to test get_line()
+  // Serial.println(get_line());
 
   // going to put our FSM in here
 
@@ -77,8 +85,8 @@ void loop() {
 // void drive(vel_L, vel_R)
 
 float get_distance() {
-  float echoTime;             // var to store time of flight
-  float calculatedDistance;   // var to store distance calculated from time of flight
+  float echo_time;             // var to store time of flight
+  float calculated_distance;   // var to store distance calculated from time of flight
 
   // send out an ultrasonic pulse thats 10ms long
   digitalWrite(trig, HIGH);
@@ -86,14 +94,14 @@ float get_distance() {
   digitalWrite(trig, LOW);
 
   // use pulseIn function to see how long it takes for the pulse to return to the sensor
-  echoTime = pulseIn(echo, HIGH);
+  echo_time = pulseIn(echo, HIGH);
 
   // calculate distance using formula from ToF sensor section
-  calculatedDistance = echoTime * 346 / 2; // make sure this fxn returns reasonable vals
+  return calculated_distance = echo_time * 346 / 2; // make sure this fxn returns reasonable vals
 }
 
 bool get_line() {
-
+  return digitalRead(ir);
 }
 
 float get_odom() {
