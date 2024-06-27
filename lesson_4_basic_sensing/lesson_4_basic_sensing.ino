@@ -136,10 +136,10 @@ void loop() {
       }
       // perform set of actions
       if (get_line()) {             // if robot sees the line
-        motor_controller(0.1, 1);   // slowly forward, turning right
+        motor_controller(0.1, 1);   // slowly forward, turning left
       }
       if (!get_line()) {            // if robot DOES NOT see the line
-        motor_controller(0.1, -1);  // slowly forward, turning left
+        motor_controller(0.1, -1);  // slowly forward, turning right
       }
       break;
 
