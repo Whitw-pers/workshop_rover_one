@@ -50,10 +50,9 @@ Encoders left_encoder(a_l, b_l);
 
 //--------------------set up FSM--------------------
 enum STATE {follow_right, turn_right, follow_left, turn_left, stop};
-enum STATE last_state;
-enum STATE current_state = follow_right;  // give it a value so we can enter the switch:case on first loop
-enum STATE next_state = current_state;    // give this a value so our switch:case behaves
-
+STATE last_state;
+STATE current_state = follow_right;   // give it a value so we can enter the switch:case on first loop
+STATE next_state = current_state;     // give this a value so our switch:case behaves
 
 void setup() {
   // put your setup code here, to run once:
@@ -90,16 +89,16 @@ void loop() {
   // delay(2000);
   // Serial.println(get_odom());
 
-  // going to put our FSM in here:
+  // Put your FSM in here:
   switch (current_state) {
 
     case follow_right :
       // check for events
-      if (get_odom() > 10) {
+      if (get_odom() > 10) {        // our odometer hits 10m
         next_state = stop;
         break;
       }
-      if (get_distance() < 0.1) {
+      if (get_distance() < 0.1) {   // we come w/in 10cm (0.1m) of a box 
         next_state = turn_right;
         break;
       }
@@ -107,19 +106,22 @@ void loop() {
       if (get_line()) {             // if robot sees the line
         motor_controller(0.1, -1);  // slowly forward, turning right
       }
-      else {                        // if robot DOES NOT see the line
+      if (!get_line()) {            // if robot DOES NOT see the line
         motor_controller(0.1, 1);   // slowly forward, turning left
       }
       break;
 
     case turn_right :
+      // perform set of actions
+      motor_controller(0, -3);
+      if (last_state != turn_right) { // debouncer to make sure we actually turn around
+        delay(500); // will need to play with this value for effective debouncing
+      }
       // check for events
       if (get_line()) {
         next_state = follow_left;
         break;
       }
-      // perform set of actions
-      motor_controller(0, -3); // I know this won't work but I feel like being lazy right now
       break;
 
     case follow_left :
@@ -136,27 +138,30 @@ void loop() {
       if (get_line()) {             // if robot sees the line
         motor_controller(0.1, 1);   // slowly forward, turning right
       }
-      else {                        // if robot DOES NOT see the line
+      if (!get_line()) {            // if robot DOES NOT see the line
         motor_controller(0.1, -1);  // slowly forward, turning left
       }
       break;
 
     case turn_left :
+      // perform set of actions
+      motor_controller(0, 3);
+      if (last_state != turn_left) { // debouncer to make sure we actually turn around
+        delay(500); 
+      }
       // check for events
       if (get_line()) {
         next_state = follow_right;
         break;
       }
-      // perform set of actions
-      motor_controller(0, 3); // still won't work, but its a tomorrow problem
       break;
 
     case stop :
       // perform set of actions
       motor_controller(0, 0);
-      delay(3000);
       right_encoder.setEncoderCount(0);
       left_encoder.setEncoderCount(0);
+      delay(3000);
       // set next_state
       if (last_state == follow_right) {
         next_state = turn_right;
