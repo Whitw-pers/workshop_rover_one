@@ -133,10 +133,41 @@ void loop() {
   // Put your FSM in here:
   switch (current_state) {
     case drive_forward :
+      // check for events
+      if (get_distance() < 0.1) {
+        next_state = turn_right;
+        break;
+      }
+      if (get_odom() > 0.2 && last_state = turn_right) {
+        next_state = turn_left;
+        break;
+      }
+      // perform actions
+      motor_controller(0.1);
       break;
     case turn_right :
+      // check for events
+      if (abs(get_angle + 90) < 5) {
+        next_state = drive_forward;
+        break;
+      }
+      // perform actions
+      motor_controller(0, -3);
+      right_encoder.setEncoderCount(0);
+      left_encoder.setEncoderCount(0);
       break;
     case turn_left :
+      // check for events
+      if (abs(get_angle()) < 5) {
+        next_state = drive_forward;
+        break;
+      }
+      if (get_distance < 0.1) {
+        next_state = turn_right;
+        break;
+      }
+      // perform actions
+      motor_controller(0, 3);
       break;
   }
 
