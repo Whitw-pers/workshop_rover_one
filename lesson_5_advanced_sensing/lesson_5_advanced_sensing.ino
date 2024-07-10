@@ -191,7 +191,7 @@ float get_angle() {
   icm.getEvent(&accel, &gyro, &temp, &mag);
 
   // determine angular position
-  float angle = atan2(-mag.magnetic.y, -mag.magnetic.x) * RAD_TO_DEG;
+  float angle = atan2(-mag.magnetic.y, mag.magnetic.x) * RAD_TO_DEG;
 
   return angle;
 }
