@@ -15,6 +15,9 @@ left and right directions referenced in comments are from the robot's perspectiv
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 
+// create icm object from ICM20948 class
+Adafruit_ICM20948 icm;
+
 //--------------------rover geometry parameters--------------------
 // motor_controller() uses these parameters to calculate wheel velocities
 // get_odom() uses them to track distance travelled
@@ -89,40 +92,35 @@ void setup() {
   // try to initialize
   if (!icm.begin_I2C()) {
     Serial.println("failed to find ICM20948 chip");
-    while (TRUE) { // enter infinite loop if chip is not found
+    while (1) { // enter infinite loop if chip is not found
       delay(10);
     }
   }
 
   Serial.println("ICM20948 found");
 
-  // icm.setAccelRange(ICM20948_ACCEL_RANGE_16_G);
-  Serial.print("Accelerometer range set to: ");
-  switch (icm.getAccelRange()) {
-    case ICM20948_ACCEL_RANGE_2_G:
-      Serial.println("+-2G");
+  // icm.setMagDataRate(AK09916_MAG_DATARATE_100_HZ); 
+  Serial.print("Magnetometer data rate set to: ");
+  switch (icm.getMagDataRate()) {
+    case AK09916_MAG_DATARATE_SHUTDOWN:
+      Serial.println("Shutdown");
       break;
-    case ICM20948_ACCEL_RANGE_4_G:
-      Serial.println("+-4G");
+    case AK09916_MAG_DATARATE_SINGLE:
+      Serial.println("Single/One shot");
       break;
-    case ICM20948_ACCEL_RANGE_8_G:
-      Serial.println("+-8G");
+    case AK09916_MAG_DATARATE_10_HZ:
+      Serial.println("10 Hz");
       break;
-    case ICM20948_ACCEL_RANGE_16_G:
-      Serial.println("+-16G");
+    case AK09916_MAG_DATARATE_20_HZ:
+      Serial.println("20 Hz");
+      break;
+    case AK09916_MAG_DATARATE_50_HZ:
+      Serial.println("50 Hz");
+      break;
+    case AK09916_MAG_DATARATE_100_HZ:
+      Serial.println("100 Hz");
       break;
   }
-  Serial.println("OK");
-
-  // icm.setAccelRateDivisor(4095);
-  uint16_t accel_divisor = icm.getAccelRateDivisor();
-  float accel_rate = 1125 / (1.0 + accel_divisor);
-
-  Serial.print("Accelerometer data rate divisor set to: ");
-  Serial.println(accel_divisor);
-  Serial.print("Accelerometer data rate (Hz) is approximately: ");
-  Serial.println(accel_rate);
-
   Serial.println();
 
 }
@@ -138,16 +136,16 @@ void loop() {
         next_state = turn_right;
         break;
       }
-      if (get_odom() > 0.2 && last_state = turn_right) {
+      if (get_odom() > 0.2 && last_state == turn_right) {
         next_state = turn_left;
         break;
       }
       // perform actions
-      motor_controller(0.1);
+      motor_controller(0.1, 0);
       break;
     case turn_right :
       // check for events
-      if (abs(get_angle + 90) < 5) {
+      if (abs(get_angle() + 90) < 5) {  // think I'll need to play with the logic of this statement
         next_state = drive_forward;
         break;
       }
@@ -162,7 +160,7 @@ void loop() {
         next_state = drive_forward;
         break;
       }
-      if (get_distance < 0.1) {
+      if (get_distance() < 0.1) {
         next_state = turn_right;
         break;
       }
@@ -187,10 +185,13 @@ void loop() {
 float get_angle() {
   // get a new normalized sensor event
   sensors_event_t accel;
-  icm.getEvent(&accel);
+  sensors_event_t gyro;
+  sensors_event_t mag;
+  sensors_event_t temp;
+  icm.getEvent(&accel, &gyro, &temp, &mag);
 
   // determine angular position
-  float angle = atan2(accel.acceleration.x, accel.acceleration.y) * RAD_TO_DEG; // will prob need to change which axes you use to get right value
+  float angle = atan2(-mag.magnetic.y, -mag.magnetic.x) * RAD_TO_DEG;
 
   return angle;
 }
