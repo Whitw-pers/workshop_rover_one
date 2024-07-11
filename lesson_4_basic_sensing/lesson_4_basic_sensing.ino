@@ -2,7 +2,9 @@
 By Whit Whittall
 COSGC New Robotics Workshop code for lesson 4 basic sensing
 
-robot is oriented correctly when the USB in of the arduino is_____
+Adds three common hobby robotics sensors: ultrasonic time of flight, IR reflectance, and quadrature encoders
+Demonstrates use of finite state machine for robotic decision making
+
 left and right directions referenced in comments are from the robot's perspective
 */ 
 

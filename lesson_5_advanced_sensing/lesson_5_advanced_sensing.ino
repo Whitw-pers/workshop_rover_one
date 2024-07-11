@@ -2,7 +2,8 @@
 By Whit Whittall
 COSGC New Robotics Workshop code for lesson 5 advanced sensing
 
-robot is oriented correctly when the USB in of the arduino is_____
+Demonstrates use of IMU sensor with I2C communication protocol
+
 left and right directions referenced in comments are from the robot's perspective
 */ 
 

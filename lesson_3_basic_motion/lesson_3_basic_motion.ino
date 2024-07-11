@@ -2,7 +2,8 @@
 By Whit Whittall
 COSGC New Robotics Workshop code for lesson 3 basic motion
 
-robot is oriented correctly when the USB in of the arduino is_____
+Finds wheel speeds based on input direction vector and drives brushed DC motors with dual H-bridge motor driver
+
 left and right directions referenced in comments are from the robot's perspective
 */ 
 
