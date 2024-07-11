@@ -81,7 +81,7 @@ void setup() {
   pinMode(ir, INPUT);
   // no need to setup our encoder pins, the library takes care of that
 
-  //--------------------set up accelerometer--------------------
+  //--------------------set up magnetometer--------------------
   Serial.begin(115200);
 
   while (!Serial) {
