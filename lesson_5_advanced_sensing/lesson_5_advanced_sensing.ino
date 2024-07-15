@@ -14,7 +14,7 @@ left and right directions referenced in comments are from the robot's perspectiv
 #include <Adafruit_ICM20X.h>
 #include <Adafruit_ICM20948.h>
 #include <Adafruit_Sensor.h>
-#include <Wire.h>
+#include <Wire.h> // A4 is SDA, A5 is SCL
 
 // create icm object from ICM20948 class
 Adafruit_ICM20948 icm;
@@ -28,31 +28,32 @@ const float L = 0.146;   // width separating the drive wheels in meters
 //--------------------declare motor pins--------------------
 // setup() and drive() use these variables to control Arduino pins
 // declare pins to control right motor
-const int R1 = 3;    //AI1
-const int R2 = 4;    //AI2
-const int pwmR = 5;  //PWMA
+const int R1 = 8;    //AI1  -> D8
+const int R2 = 7;    //AI2  -> D7
+const int pwmR = 6;  //PWMA -> D6
 
-// declare pins to control right motor
-const int L1 = 7;    //BI1
-const int L2 = 8;    //BI2
-const int pwmL = 9;  //PWMB
+// declare pins to control left motor
+const int L1 = 5;    //BI1  -> D5
+const int L2 = 4;    //BI2  -> D4
+const int pwmL = 3;  //PWMB -> D3
 
 //--------------------declare sensor pins--------------------
 // declare echo and trig pins for ultrasonic sensor
 
-const int echo = ;
-const int trig = ;
+const int echo = 0; // Echo  -> D0 (RX)
+const int trig = 1; // Trig  -> D1 (TX)
 
 // declare pin for infrared sensor
 
-const int ir = ;
+const int ir = 13;  // OUT  -> D13
 
 // declare a and b pins for encoders (can be analog pins)
-
-const int a_r = ;
-const int b_r = ;
-const int a_l = ;
-const int b_l = ;
+// right encoder
+const int a_r = 9;  // A  -> D9
+const int b_r = 10; // B  -> D10
+// left encoder
+const int a_l = 11; // A  -> D11
+const int b_l = 12; // B  -> D12
 
 // lets also create our encoder objects
 Encoders right_encoder(a_r, b_r);
@@ -61,7 +62,7 @@ Encoders left_encoder(a_l, b_l);
 //--------------------set up FSM--------------------
 enum STATE {drive_forward, turn_right, turn_left};
 STATE last_state;
-STATE current_state = drive_forward;   // give it a value so we can enter the switch:case on first loop
+STATE current_state = drive_forward;  // give it a value so we can enter the switch:case on first loop
 STATE next_state = current_state;     // give this a value so our switch:case behaves
 
 void setup() {
