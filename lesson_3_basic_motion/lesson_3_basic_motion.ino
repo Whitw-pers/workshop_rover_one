@@ -69,7 +69,7 @@ void loop() {
 // void motor_controller(v, w)
 // void drive(vel_L, vel_R)
 
-void motor_controller(int v, int w) {
+void motor_controller(float v, float w) {
 // determines required wheel speeds (in rad/s) based on linear and angular velocities (m/s, rad/s)
 // maps required wheel speeds to PWM duty cycle
 // expects -0.346 < v < 0.346 m/s, -4.73 < w < 4.73 rad/s
@@ -105,7 +105,7 @@ void drive(int duty_L, int duty_R) {
     digitalWrite(L1, LOW);
     digitalWrite(L2, HIGH);
   }
-  if (duty_L == 0) {  // left motor forward
+  if (duty_L == 0) {  // left motor stop
     digitalWrite(L1, LOW);
     digitalWrite(L2, LOW);
   }
@@ -118,7 +118,7 @@ void drive(int duty_L, int duty_R) {
     digitalWrite(R1, LOW);
     digitalWrite(R2, HIGH);
   }
-  if (duty_R == 0) {  // right motor forward
+  if (duty_R == 0) {  // right motor stop
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
   }
