@@ -217,6 +217,8 @@ float get_distance() {
 bool get_line() {
   // returns 0 (false) if no reflection seen (over black surface)
   // returns 1 (true) if reflection seen (over white surface)
+  // this only worked when the lipo was plugged in as well as the serial cable
+  // the IR sensor NEEDS to be fed ~5V
   return !digitalRead(ir);
 }
 
