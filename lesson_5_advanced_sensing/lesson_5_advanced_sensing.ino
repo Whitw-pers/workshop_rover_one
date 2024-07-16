@@ -40,8 +40,8 @@ const int pwmL = 3;  //PWMB -> D3
 //--------------------declare sensor pins--------------------
 // declare echo and trig pins for ultrasonic sensor
 
-const int echo = 0; // Echo  -> D0 (RX)
-const int trig = 1; // Trig  -> D1 (TX)
+const int echo = 11; // Echo  -> D11
+const int trig = 12; // Trig  -> D12
 
 // declare pin for infrared sensor
 
@@ -49,11 +49,11 @@ const int ir = 13;  // OUT  -> D13
 
 // declare a and b pins for encoders (can be analog pins)
 // right encoder
-const int a_r = 9;  // A  -> D9
-const int b_r = 10; // B  -> D10
+const int a_r = A3; // A  -> A3
+const int b_r = A2; // B  -> A2
 // left encoder
-const int a_l = 11; // A  -> D11
-const int b_l = 12; // B  -> D12
+const int a_l = A1; // A  -> A1
+const int b_l = A0; // B  -> A0
 
 // lets also create our encoder objects
 Encoders right_encoder(a_r, b_r);
@@ -199,6 +199,9 @@ float get_angle() {
 }
 
 float get_distance() {
+  // finds the distance of an object in front of the ultrasonic sensor
+  // if this returns 0.00, check that the sensor is getting 5V
+  // also check trig and echo pins aren't reversed
   float echo_time;             // var to store time of flight
   float calculated_distance;   // var to store distance calculated from time of flight
 
@@ -211,22 +214,25 @@ float get_distance() {
   echo_time = pulseIn(echo, HIGH);
 
   // calculate distance using formula from ToF sensor section
-  return calculated_distance = echo_time * 346 / 2; // make sure this fxn returns reasonable vals
+  return calculated_distance = (echo_time / 2) / (346 * 10); 
+  //*10 is to scale units appropriately since pulseIn returns in microseconds
 }
 
 bool get_line() {
-  return digitalRead(ir);
+  // returns 0 (false) if no reflection seen (over black surface)
+  // returns 1 (true) if reflection seen (over white surface)
+  return !digitalRead(ir);
 }
 
-long get_odom() {
+float get_odom() {
   // get encoder counts using getEncoderCount method from the Encoders class
   long left_encoder_count = left_encoder.getEncoderCount();
   long right_encoder_count = right_encoder.getEncoderCount();
 
-  long left_wheel_pos = left_encoder_count * ((2 * 3.14) / 3575.04);
-  long right_wheel_pos = right_encoder_count * ((2 * 3.14) / 3575.04);
+  float left_wheel_pos = left_encoder_count * ((2 * 3.14) / 3575.04);
+  float right_wheel_pos = right_encoder_count * ((2 * 3.14) / 3575.04);
 
-  long odom = (r / 2) * (left_wheel_pos + right_wheel_pos);
+  float odom = (r / 2) * (left_wheel_pos + right_wheel_pos);
   return odom;
 }
 

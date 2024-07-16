@@ -1,6 +1,7 @@
 /* 
 By Whit Whittall
 COSGC New Robotics Workshop code for lesson 3 basic motion
+Verified to work using Robotics Workshop BOM hardware on 7/16/2024
 
 Finds wheel speeds based on input direction vector and drives brushed DC motors with dual H-bridge motor driver
 
@@ -45,22 +46,22 @@ void loop() {
   float v = 0.346;    // linear velocity (0.346 is forward full, -0.346 is back full)
   float w = 0;        // angular velocity (4.73 is rotate left full, -4.73 is rotate right full)
   motor_controller(v, w);
-  delay(2000);
+  delay(1000);
 
   v = -0.346;
   w = 0;
   motor_controller(v,w);
-  delay(2000);
+  delay(1000);
 
   v = 0;
   w = 4.73;
   motor_controller(v,w);
-  delay(2000);
+  delay(1000);
 
   v = 0;
   w = -4.73;
   motor_controller(v,w);
-  delay(2000);
+  delay(1000);
 
   // play around with the velocities and the delay() function and see what you can get your robot to do
 }
