@@ -1,6 +1,7 @@
 /* 
 By Whit Whittall
 COSGC New Robotics Workshop code for lesson 4 basic sensing
+Verified to work using Robotics Workshop BOM hardware on 7/16/2024
 
 Adds three common hobby robotics sensors: ultrasonic time of flight, IR reflectance, and quadrature encoders
 Demonstrates use of finite state machine for robotic decision making
@@ -100,7 +101,7 @@ void loop() {
 
     case follow_right :
       // check for events
-      if (get_odom() > 10) {        // our odometer hits 10m
+      if (get_odom() > 5) {        // our odometer hits 5m
         next_state = stop;
         break;
       }
