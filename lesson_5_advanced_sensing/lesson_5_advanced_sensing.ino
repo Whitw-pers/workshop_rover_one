@@ -1,8 +1,10 @@
 /* 
 By Whit Whittall
 COSGC New Robotics Workshop code for lesson 5 advanced sensing
+Verified to work using Robotics Workshop BOM hardware on 7/17/2024
 
 Demonstrates use of IMU sensor with I2C communication protocol
+Opportunity to build FSM with less guidance to navigate around an obstacle
 
 left and right directions referenced in comments are from the robot's perspective
 */ 
@@ -82,7 +84,7 @@ void setup() {
   pinMode(ir, INPUT);
   // no need to setup our encoder pins, the library takes care of that
 
-  //--------------------set up magnetometer--------------------
+  //--------------------set up ICM20948 IMU--------------------
   Serial.begin(115200);
 
   while (!Serial) {
@@ -100,6 +102,23 @@ void setup() {
   }
 
   Serial.println("ICM20948 found");
+
+  // icm.setAccelRange(ICM20948_ACCEL_RANGE_16_G);
+  Serial.print("Accelerometer range set to: ");
+  switch (icm.getAccelRange()) {
+  case ICM20948_ACCEL_RANGE_2_G:
+    Serial.println("+-2G");
+    break;
+  case ICM20948_ACCEL_RANGE_4_G:
+    Serial.println("+-4G");
+    break;
+  case ICM20948_ACCEL_RANGE_8_G:
+    Serial.println("+-8G");
+    break;
+  case ICM20948_ACCEL_RANGE_16_G:
+    Serial.println("+-16G");
+    break;
+  }
 
   // icm.setMagDataRate(AK09916_MAG_DATARATE_100_HZ); 
   Serial.print("Magnetometer data rate set to: ");
@@ -123,12 +142,39 @@ void setup() {
       Serial.println("100 Hz");
       break;
   }
+
+  //  icm.setAccelRateDivisor(4095);
+  uint16_t accel_divisor = icm.getAccelRateDivisor();
+  float accel_rate = 1125 / (1.0 + accel_divisor);
+
+  Serial.print("Accelerometer data rate divisor set to: ");
+  Serial.println(accel_divisor);
+  Serial.print("Accelerometer data rate (Hz) is approximately: ");
+  Serial.println(accel_rate);
+
   Serial.println();
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  // uncomment to test get_angle_mag()
+  //Serial.println(get_angle_mag());
+  //delay(1000);
+
+  // uncomment to test get_pitch()
+  //Serial.println(get_pitch());
+  //delay(1000);
+
+  // uncomment to test get_angle_odom()
+  /*
+  while(get_angle_odom() < 90) {
+    Serial.println(get_angle_odom()); 
+    motor_controller(0, 2);
+  }
+  motor_controller(0, 0);
+  */
 
   // Put your FSM in here:
   switch (current_state) {
@@ -138,27 +184,32 @@ void loop() {
         next_state = turn_right;
         break;
       }
-      if (get_odom() > 0.2 && last_state == turn_right) {
+      if (last_state == turn_right) {
+        while (get_odom() < 0.2) {
+          motor_controller(0.2, 0);
+        }
         next_state = turn_left;
         break;
       }
       // perform actions
-      motor_controller(0.1, 0);
+      motor_controller(0.2, 0);
       break;
     case turn_right :
       // check for events
-      if (abs(get_angle() + 90) < 5) {  // think I'll need to play with the logic of this statement
+      if (abs(get_angle_odom() + 90) < 3) {  // think I'll need to play with the logic of this statement
         next_state = drive_forward;
         break;
       }
       // perform actions
       motor_controller(0, -3);
-      right_encoder.setEncoderCount(0);
-      left_encoder.setEncoderCount(0);
+      if (last_state != turn_right) { // we only want to reset encoders once, otherwise robot won't detect the heading
+        right_encoder.setEncoderCount(0);
+        left_encoder.setEncoderCount(0);      
+      }
       break;
     case turn_left :
       // check for events
-      if (abs(get_angle()) < 5) {
+      if (abs(get_angle_odom()) < 3) {
         next_state = drive_forward;
         break;
       }
@@ -177,14 +228,17 @@ void loop() {
 
 
 //--------------------CUSTOM FXNS--------------------
-// float get_angle();
+// float get_angle_mag();
+// float get_pitch();
+// float get_angle_odom();
 // float get_distance();
 // bool get_line();
 // long get_odom();
 // void motor_controller(v, w)
 // void drive(vel_L, vel_R)
 
-float get_angle() {
+float get_angle_mag() {
+  // attempts to find the magnetic heading of the robot using ICM20948 IMU magnetometer
   // get a new normalized sensor event
   sensors_event_t accel;
   sensors_event_t gyro;
@@ -193,9 +247,37 @@ float get_angle() {
   icm.getEvent(&accel, &gyro, &temp, &mag);
 
   // determine angular position
-  float angle = atan2(-mag.magnetic.y, mag.magnetic.x) * RAD_TO_DEG;
+  float mag_heading = atan2(-mag.magnetic.y, mag.magnetic.x) * RAD_TO_DEG;
 
-  return angle;
+  return mag_heading;
+}
+
+float get_pitch() {
+  // finds the pitch of the robot using ICM20948 IMU accelerometer
+  // get a new normalized sensor event
+  sensors_event_t accel;
+  sensors_event_t gyro;
+  sensors_event_t mag;
+  sensors_event_t temp;
+  icm.getEvent(&accel, &gyro, &temp, &mag);
+
+  // determine angular position
+  float pitch = atan2(accel.acceleration.z, accel.acceleration.y) * RAD_TO_DEG - 90;
+
+  return pitch;
+}
+
+float get_angle_odom() {
+  // determines orientation of the robot using odometry and forward kinematics
+  // get encoder counts using getEncoderCount method from the Encoders class
+  long left_encoder_count = left_encoder.getEncoderCount();
+  long right_encoder_count = right_encoder.getEncoderCount();
+
+  float left_wheel_pos = left_encoder_count * ((2 * 3.14) / 3575.04);
+  float right_wheel_pos = right_encoder_count * ((2 * 3.14) / 3575.04);
+
+  float heading = (r / L) * (right_wheel_pos - left_wheel_pos) * RAD_TO_DEG;
+  return heading;
 }
 
 float get_distance() {
